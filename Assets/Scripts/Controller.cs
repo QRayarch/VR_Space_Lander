@@ -48,6 +48,20 @@ public class Controller : MonoBehaviour {
                 pickup.transform.parent = this.transform;
                 pickup.GetComponent<Rigidbody>().isKinematic = true;
             }
+        }else if (collider.tag == "winch")
+        {
+            Debug.DrawLine(collider.transform.position, transform.position, Color.red);
+
+            if (controller.GetPress(gripButton))
+            {
+                WinchHandle butts = collider.gameObject.GetComponent<WinchHandle>();
+                Vector3 temp = transform.position;
+                temp.x = butts.winchParent.transform.position.x;
+                butts.winchParent.transform.rotation = Quaternion.LookRotation(temp - transform.position);
+                //butts.winchParent.transform.LookAt(transform);
+                //butts.winchParent.transform.rotation = Quaternion.Euler(butts.winchParent.transform.rotation.eulerAngles.x, 0, 0);
+                //Debug.Log(butts.winchParent.transform.rotation.eulerAngles);
+            }
         }
     }
 
