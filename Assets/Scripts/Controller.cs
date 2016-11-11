@@ -6,9 +6,10 @@ public class Controller : MonoBehaviour {
     private Valve.VR.EVRButtonId gripButton = Valve.VR.EVRButtonId.k_EButton_Grip;
 
     public GameObject pickup;
+    public SteamVR_Controller.DeviceRelation hand;
 
     private SteamVR_TrackedObject trackedObj;
-    private SteamVR_Controller.Device controller {  get { return SteamVR_Controller.Input((int)trackedObj.index); } }
+    private SteamVR_Controller.Device controller {  get { return SteamVR_Controller.Input(SteamVR_Controller.GetDeviceIndex(hand)); } }
 
     // Use this for initialization
     void Start () {
@@ -22,26 +23,36 @@ public class Controller : MonoBehaviour {
         {
             return;
         }
-
-        if (controller.GetPressDown(gripButton) && pickup != null)
+        if (controller.GetPressUp(gripButton))
         {
-            pickup.transform.parent = this.transform;
-            pickup.GetComponent<Rigidbody>().isKinematic = true; 
-        }
-        if(controller.GetPressUp(gripButton) && pickup != null)
-        {
-            pickup.transform.parent = null;
-            pickup.GetComponent<Rigidbody>().isKinematic = false;
+            Drop();
         }
     }
 
-    private void OnTriggerEnter(Collider collider)
+    private void Drop()
     {
-        pickup = collider.gameObject;
+        if (pickup == null) return;
+        pickup.transform.parent = null;
+        pickup.GetComponent<Rigidbody>().isKinematic = false;
+        pickup = null;
+    }
+
+    private void OnTriggerStay(Collider collider)
+    {
+        if(collider.tag == "interactable")
+        {
+            if (controller.GetPressDown(gripButton))
+            {
+                Drop();
+                pickup = collider.gameObject;
+                pickup.transform.parent = this.transform;
+                pickup.GetComponent<Rigidbody>().isKinematic = true;
+            }
+        }
     }
 
     private void OnTriggerExit(Collider collider)
     {
-        pickup = null;
+        //pickup = null;
     }
 }
