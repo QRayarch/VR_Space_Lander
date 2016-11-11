@@ -19,16 +19,20 @@ public class Snap : MonoBehaviour {
     {
         lController = GameObject.Find("Controller (left)");
         rController = GameObject.Find("Controller (right)");
-        if (collider.gameObject.tag == "interactable")
+
+        if(collider.gameObject.transform.parent == lController)
         {
             GameObject lpickup = lController.GetComponent<Controller>().pickup;
-            GameObject rpickup = rController.GetComponent<Controller>().pickup;
-            if (lpickup != null && rpickup == null)
+            if(lpickup.name == "Battery")
             {
                 SnapObject(lpickup);
                 lController.GetComponent<Controller>().pickup = null;
             }
-            else if(lpickup == null && rpickup != null)
+        }
+        if(collider.gameObject.transform.parent == rController)
+        {
+            GameObject rpickup = rController.GetComponent<Controller>().pickup;
+            if(rpickup.gameObject.name == "Battery")
             {
                 SnapObject(rpickup);
                 rController.GetComponent<Controller>().pickup = null;
