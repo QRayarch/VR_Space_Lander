@@ -9,41 +9,54 @@ public class Snap : MonoBehaviour {
     // Use this for initialization
     void Start () {
     }
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
+
 
     private void OnTriggerEnter(Collider collider)
     {
-        lController = GameObject.Find("Controller (left)");
+        /*lController = GameObject.Find("Controller (left)");
         rController = GameObject.Find("Controller (right)");
 
-        if(collider.gameObject.transform.parent == lController)
+        if (collider.gameObject.transform.parent == lController)
         {
             GameObject lpickup = lController.GetComponent<Controller>().pickup;
-            if(lpickup.name == "Battery")
+            if (lpickup.name.Equals("Battery"))
             {
+                lController.GetComponent<Controller>().Drop();
                 SnapObject(lpickup);
-                lController.GetComponent<Controller>().pickup = null;
             }
         }
-        if(collider.gameObject.transform.parent == rController)
+        if (collider.gameObject.transform.parent == rController)
         {
             GameObject rpickup = rController.GetComponent<Controller>().pickup;
-            if(rpickup.gameObject.name == "Battery")
+            if (rpickup.gameObject.name.Equals("Battery"))
             {
+                rController.GetComponent<Controller>().Drop();
                 SnapObject(rpickup);
-                rController.GetComponent<Controller>().pickup = null;
             }
+        }*/
+        if (collider.gameObject.name.Equals("Battery"))
+        {
+            Controller[] controllers = FindObjectsOfType<Controller>();
+            for(int c = 0; c < controllers.Length; ++c)
+            {
+                if(controllers[c].pickup == collider.gameObject)
+                {
+                    controllers[c].Drop();
+                }
+            }
+            SnapObject(collider.gameObject);
         }
     }
 
     private void SnapObject(GameObject pickup)
     {
-        pickup.transform.parent = null;
-        pickup.transform.position = this.transform.position;
-        pickup.transform.rotation = this.transform.rotation;
+        pickup.transform.SetParent(transform);
+        pickup.transform.localPosition = Vector3.zero;
+        pickup.transform.localRotation = Quaternion.identity;
+        Rigidbody rBody = pickup.GetComponent<Rigidbody>();
+        if(rBody != null)
+        {
+            rBody.isKinematic = true;
+        }
     }
 }

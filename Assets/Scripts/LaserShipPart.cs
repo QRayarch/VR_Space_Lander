@@ -16,6 +16,7 @@ public class LaserShipPart : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         lineRender = GetComponent<LineRenderer>();
+        lineRender.useWorldSpace = true;
         shipComponent = GetComponent<ShipComponent>();
     }
 	
@@ -23,11 +24,13 @@ public class LaserShipPart : MonoBehaviour {
 	void Update () {
         RaycastHit hit;
         float dist = maxDistance;
-	    if(Physics.SphereCast(transform.position, radius, transform.forward, out hit, maxDistance, laserHitMask.value, QueryTriggerInteraction.Ignore))
+        if (Physics.SphereCast(transform.position, radius, transform.forward, out hit, maxDistance, laserHitMask.value, QueryTriggerInteraction.Ignore))
         {
             dist = hit.distance + radius;
         }
-        lineRender.SetPosition(1, transform.forward * dist);
+        lineRender.SetPosition(0, transform.position);
+        lineRender.SetPosition(1, transform.position + transform.forward * dist);
+
         if(dist >= distanceToActivateOn)
         {
             shipComponent.Activate();
@@ -41,6 +44,5 @@ public class LaserShipPart : MonoBehaviour {
     public void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawWireCube(transform.position + transform.forward * distanceToActivateOn, Vector3.one * radius);
     }
 }

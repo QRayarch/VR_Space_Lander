@@ -3,13 +3,17 @@ using System.Collections;
 
 public class Controller : MonoBehaviour {
 
-    private Valve.VR.EVRButtonId gripButton = Valve.VR.EVRButtonId.k_EButton_Grip;
+    private Valve.VR.EVRButtonId gripButton = Valve.VR.EVRButtonId.k_EButton_SteamVR_Trigger;
 
     public GameObject pickup;
     public SteamVR_Controller.DeviceRelation hand;
 
     private SteamVR_TrackedObject trackedObj;
     private SteamVR_Controller.Device controller {  get { return SteamVR_Controller.Input(SteamVR_Controller.GetDeviceIndex(hand)); } }
+
+    Rigidbody heldObject;
+
+    public Collider coll;
 
     // Use this for initialization
     void Start () {
@@ -27,14 +31,21 @@ public class Controller : MonoBehaviour {
         {
             Drop();
         }
+        if (heldObject)
+        {
+            heldObject.velocity = (transform.position - heldObject.position) * 10000 * Time.deltaTime;
+            heldObject.MoveRotation(Quaternion.Lerp(heldObject.rotation, transform.rotation, Time.deltaTime * 100f));
+        }
     }
 
-    private void Drop()
+    public void Drop()
     {
         if (pickup == null) return;
-        pickup.transform.parent = null;
-        pickup.GetComponent<Rigidbody>().isKinematic = false;
+        //pickup.transform.parent = null;
+        //pickup.GetComponent<Rigidbody>().isKinematic = false;
+        Physics.IgnoreCollision(coll, pickup.GetComponent<Collider>(), true);
         pickup = null;
+        heldObject = null;
     }
 
     private void OnTriggerStay(Collider collider)
@@ -45,8 +56,10 @@ public class Controller : MonoBehaviour {
             {
                 Drop();
                 pickup = collider.gameObject;
-                pickup.transform.parent = this.transform;
-                pickup.GetComponent<Rigidbody>().isKinematic = true;
+                //pickup.transform.parent = this.transform;
+                heldObject = pickup.GetComponent<Rigidbody>();
+                Physics.IgnoreCollision(coll, collider, true);
+                //pickupBody.isKinematic = true;
             }
         }else if (collider.tag == "winch")
         {
